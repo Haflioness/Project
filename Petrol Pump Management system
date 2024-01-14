@@ -1,0 +1,142 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class Fuel {
+public:
+    Fuel(const string& name, double pricePerLiter): name(name), pricePerLiter(pricePerLiter) {}
+
+    string getName() const {
+        return name;
+    }
+
+    double getPricePerLiter() const {
+        return pricePerLiter;
+    }
+
+private:
+    string name;
+    double pricePerLiter;
+};
+
+
+class Pump {
+public:
+    Pump(int pumpNumber): pumpNumber(pumpNumber), currentFuel(nullptr) 
+	{
+	}
+
+    int getPumpNumber() const {
+        return pumpNumber;
+    }
+
+  
+    void assignFuel(Fuel* fuel) {
+        currentFuel = fuel;
+    }
+
+    bool hasFuel() const {
+       return currentFuel != nullptr;
+}
+
+    void dispenseFuel(double liters) {
+        if (currentFuel != nullptr) {
+            double cost = liters * currentFuel->getPricePerLiter();
+            cout << "Dispensing " << liters << " liters of " << currentFuel->getName() << " fuel." << endl;
+            cout << "Total cost: $" << cost << endl;
+        } else {
+            cout << "No fuel assigned to pump " << pumpNumber << "." << endl;
+        }
+    }
+
+private:
+    int pumpNumber;
+    Fuel* currentFuel;
+};
+
+
+class Customer {
+public:
+    Customer(const string& name): name(name) {
+	}
+
+    string getName() const {
+        return name;
+    }
+
+    void makePayment(double amount) {
+        cout << "Received payment of $" << amount << " from customer " << name << "." << endl;
+    }
+
+private:
+    string name;
+};
+
+class Payment {
+public:
+    Payment(double amount)
+        : amount(amount) {}
+
+    double getAmount() const {
+        return amount;
+    }
+
+private:
+    double amount;
+};
+
+
+class PetrolPumpManager {
+public:
+    void addFuel(Fuel* fuel) {
+        fuels.push_back(fuel);
+    }
+
+    void addPump(Pump* pump) {
+        pumps.push_back(pump);
+    }
+void serveCustomer(Customer* customer, Pump* pump, double liters) {
+   
+    if (!pump->hasFuel()) {
+        cout << "No fuel assigned to pump " << pump->getPumpNumber() << "." << endl;
+        return;
+    }
+
+    pump->dispenseFuel(liters);
+
+    Payment payment(50.0);
+    customer->makePayment(payment.getAmount());
+}
+
+
+private:
+    vector<Fuel*> fuels;
+    vector<Pump*> pumps;
+};
+
+int main() {
+    Fuel petrol("Petrol", 2.5);
+    Fuel diesel("Diesel", 2.0);
+
+    Pump pump1(1);
+    Pump pump2(2);
+
+    PetrolPumpManager pumpManager;
+    
+    pump1.assignFuel(&petrol);
+    pump2.assignFuel(&diesel);
+
+    pumpManager.addFuel(&petrol);
+    pumpManager.addFuel(&diesel);
+
+    pumpManager.addPump(&pump1);
+    pumpManager.addPump(&pump2);
+
+    Customer customer("John Doe");
+
+    pumpManager.serveCustomer(&customer, &pump1, 10.0);
+
+    return 0;
+}
